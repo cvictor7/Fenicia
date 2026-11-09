@@ -16,3 +16,4 @@ export {
   type DadosProduto,
   type FiltroProdutos,
 } from "./produtos";
+export { buscarPost, criarPost, registrarLeitura } from "./posts";

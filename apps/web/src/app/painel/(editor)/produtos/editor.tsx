@@ -12,6 +12,7 @@ import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 import { BotaoConfirmar } from "@/components/confirmar";
+import { SeletorFotos, type Foto } from "@/components/seletor-fotos";
 import { arquivarProdutoAcao, salvarProdutoAcao, type DadosEditor, type EstadoEditor } from "./acoes";
 
 type OpcaoEditor = { nome: string; valores: string[]; rascunho: string };
@@ -21,6 +22,10 @@ type Props = {
   categorias: { id: string; nome: string }[];
   inicial: DadosEditor;
   publicado?: boolean;
+  /** quando o produto nasce de um post ("o post vira produto") */
+  postId?: string | null;
+  /** conteúdo extra acima do formulário (ex.: o que a IA leu) */
+  topo?: React.ReactNode;
 };
 
 const SUGESTOES = ["Tamanho", "Cor", "Sabor", "Modelo", "Voltagem"];
@@ -44,8 +49,8 @@ const estiloCampo =
  * Editor de produto. O estado fica todo aqui no navegador e vai para o servidor como JSON;
  * o servidor valida tudo de novo antes de gravar.
  */
-export function EditorProduto({ id, categorias, inicial, publicado }: Props) {
-  const acaoSalvar = salvarProdutoAcao.bind(null, id);
+export function EditorProduto({ id, categorias, inicial, publicado, postId = null, topo }: Props) {
+  const acaoSalvar = salvarProdutoAcao.bind(null, id, postId);
   const [estado, acao, salvando] = useActionState(acaoSalvar, {} as EstadoEditor);
 
   const [nome, setNome] = useState(inicial.nome);
@@ -58,6 +63,7 @@ export function EditorProduto({ id, categorias, inicial, publicado }: Props) {
     inicial.opcoes.map((o) => ({ ...o, rascunho: "" })),
   );
   const [linhas, setLinhas] = useState(inicial.linhas);
+  const [fotos, setFotos] = useState<Foto[]>(inicial.fotos);
 
   const combinacoes = useMemo(
     () => combinarOpcoes(temVariacoes ? opcoes : []),
@@ -76,6 +82,7 @@ export function EditorProduto({ id, categorias, inicial, publicado }: Props) {
     temVariacoes,
     opcoes: opcoes.map(({ nome, valores }) => ({ nome, valores })),
     linhas,
+    fotos,
   };
 
   function mudarOpcao(i: number, mudanca: Partial<OpcaoEditor>) {
@@ -103,11 +110,11 @@ export function EditorProduto({ id, categorias, inicial, publicado }: Props) {
       <input type="hidden" name="dados" value={JSON.stringify(dados)} />
 
       <div className="flex items-center gap-2">
-        <Link href="/painel/produtos" aria-label="Voltar para produtos" className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl hover:bg-purpura-100">
+        <Link href={postId ? "/painel/novo-post" : "/painel/produtos"} aria-label="Voltar" className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl hover:bg-purpura-100">
           <ArrowLeft size={20} aria-hidden="true" />
         </Link>
         <h1 className="font-titulo text-xl font-semibold tracking-tight">
-          {id ? "Editar produto" : "Novo produto"}
+          {id ? "Editar produto" : postId ? "Confira o produto" : "Novo produto"}
         </h1>
         {publicado ? (
           <span className="ml-auto rounded-md bg-[#e3f1ea] px-2 py-0.5 text-xs text-[#0f6e56]">Publicado</span>
@@ -117,6 +124,13 @@ export function EditorProduto({ id, categorias, inicial, publicado }: Props) {
       {estado.erro ? (
         <p role="alert" className="mt-4 rounded-xl bg-[#f8e4e1] px-3.5 py-3 text-sm text-erro">{estado.erro}</p>
       ) : null}
+
+      {topo}
+
+      <section className="mt-5">
+        <h2 className="mb-2 text-sm font-medium">Fotos</h2>
+        <SeletorFotos fotos={fotos} aoMudar={setFotos} />
+      </section>
 
       <section className="mt-5 space-y-4">
         <label className="block">
@@ -367,7 +381,7 @@ export function EditorProduto({ id, categorias, inicial, publicado }: Props) {
             disabled={salvando}
             className="h-12 rounded-xl bg-purpura-700 font-medium text-purpura-100 disabled:opacity-70"
           >
-            {salvando ? "Salvando…" : publicado ? "Salvar" : "Publicar"}
+            {salvando ? "Salvando…" : publicado ? "Salvar" : postId ? "Aprovar e publicar" : "Publicar"}
           </button>
         </div>
       </div>

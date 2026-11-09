@@ -72,6 +72,14 @@ async function Lista({ searchParams }: { searchParams: Params }) {
             return (
               <li key={p.id}>
                 <Link href={`/painel/produtos/${p.id}`} className="flex items-center gap-3 px-4 py-3.5 active:bg-purpura-100/40">
+                  {p.capa ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.capa} alt="" className="h-14 w-11 shrink-0 rounded-lg object-cover" loading="lazy" />
+                  ) : (
+                    <span aria-hidden="true" className="flex h-14 w-11 shrink-0 items-center justify-center rounded-lg bg-purpura-100 font-fenicio text-xl text-purpura-500">
+                      𐤀
+                    </span>
+                  )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate font-medium">{p.nome}</p>

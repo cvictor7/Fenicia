@@ -56,6 +56,8 @@ export const origemPedido = pgEnum("origem_pedido", ["vitrine", "manual"]);
 
 /** Opções do produto, ex.: [{ nome: "Tamanho", valores: ["P", "M", "G"] }] */
 export type OpcaoProduto = { nome: string; valores: string[] };
+/** Foto já enviada para o armazenamento (Vercel Blob). */
+export type FotoEnviada = { url: string; chave: string; largura: number | null; altura: number | null };
 /** Combinação de uma variante, ex.: { Tamanho: "M", Cor: "Preto" } */
 export type AtributosVariante = Record<string, string>;
 
@@ -96,6 +98,7 @@ export const post = pgTable(
       .notNull()
       .references(() => loja.id, { onDelete: "cascade" }),
     legenda: text("legenda").notNull(),
+    imagens: jsonb("imagens").$type<FotoEnviada[]>().notNull().default([]),
     status: statusPost("status").notNull().default("processando"),
     respostaIa: jsonb("resposta_ia"),
     modeloIa: text("modelo_ia"),

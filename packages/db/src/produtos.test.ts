@@ -10,6 +10,7 @@ import {
   salvarProduto,
   type DadosProduto,
 } from "./produtos";
+import { buscarPost, criarPost } from "./posts";
 import * as schema from "./schema";
 import { bancoDeTeste } from "./teste-banco";
 import type { Banco } from "./tipos";
@@ -142,5 +143,30 @@ describe("listagem", () => {
     expect(await arquivarProduto(db, lojaId, p.id)).toBe(true);
     expect(await listarProdutosResumo(db, lojaId)).toHaveLength(0);
     expect(await listarProdutosResumo(db, lojaId, "arquivados")).toHaveLength(1);
+  });
+});
+
+describe("fotos e post", () => {
+  const foto = (n: number) => ({ url: `https://x/${n}.webp`, chave: `k${n}`, largura: 800, altura: 1000 });
+
+  it("guarda as fotos na ordem e troca quando edita", async () => {
+    const p = await salvarProduto(db, lojaId, "u1", vestido({ imagens: [foto(1), foto(2)] }));
+    expect((await buscarProdutoCompleto(db, lojaId, p.id))?.imagens.map((i) => i.chave)).toEqual(["k1", "k2"]);
+    await salvarProduto(db, lojaId, "u1", vestido({ imagens: [foto(2)] }), p.id);
+    expect((await buscarProdutoCompleto(db, lojaId, p.id))?.imagens.map((i) => i.chave)).toEqual(["k2"]);
+    expect((await listarProdutosResumo(db, lojaId))[0].capa).toBe("https://x/2.webp");
+  });
+
+  it("produto criado a partir de post fica ligado a ele e o post vira aprovado", async () => {
+    const origem = await criarPost(db, lojaId, "Vestido R$ 129,90", [foto(1)]);
+    const p = await salvarProduto(db, lojaId, "u1", vestido({ postId: origem.id }));
+    expect(p.postId).toBe(origem.id);
+    expect((await buscarPost(db, lojaId, origem.id))?.status).toBe("aprovado");
+  });
+
+  it("não aceita post de outra loja", async () => {
+    const deOutra = await criarPost(db, outraLojaId, "x", []);
+    await expect(salvarProduto(db, lojaId, "u1", vestido({ postId: deOutra.id }))).rejects.toThrow();
+    expect(await buscarPost(db, lojaId, deOutra.id)).toBeNull();
   });
 });

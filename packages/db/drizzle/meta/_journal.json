@@ -15,6 +15,13 @@
       "when": 1794250844687,
       "tag": "0001_login_e_membros",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794254929595,
+      "tag": "0002_fotos_do_post",
+      "breakpoints": true
     }
   ]
 }

@@ -21,3 +21,10 @@ export {
   type Atributos,
   type Opcao,
 } from "./produto";
+export {
+  conferirSugestao,
+  leituraSimples,
+  precosNaLegenda,
+  type SugestaoConferida,
+  type SugestaoProduto,
+} from "./ia";

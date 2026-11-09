@@ -18,6 +18,7 @@ import {
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { obterContexto } from "@/lib/contexto";
+import { esquemaFotos, fotosDaLoja } from "@/lib/validar-fotos";
 
 export type EstadoEditor = {
   erro?: string;
@@ -35,12 +36,14 @@ const esquema = z.object({
     .array(z.object({ nome: z.string().trim().max(30), valores: z.array(z.string().trim().min(1).max(30)) }))
     .max(5),
   linhas: z.record(z.string(), z.object({ estoque: z.string(), preco: z.string() })),
+  fotos: esquemaFotos,
 });
 
 export type DadosEditor = z.infer<typeof esquema>;
 
 export async function salvarProdutoAcao(
   id: string | null,
+  postId: string | null,
   _: EstadoEditor,
   form: FormData,
 ): Promise<EstadoEditor> {
@@ -59,6 +62,7 @@ export async function salvarProdutoAcao(
   }
   const dados = lido.data;
   const publicar = form.get("intencao") === "publicar";
+  if (!fotosDaLoja(dados.fotos, loja.id)) return { erro: "Foto inválida. Envie de novo." };
 
   const preco = converterPrecoDigitado(dados.preco);
   if (preco === undefined) return { campos: { preco: "Digite o preço assim: 89,90" } };
@@ -108,6 +112,8 @@ export async function salvarProdutoAcao(
         opcoes: opcoes.map((o) => ({ nome: o.nome.trim(), valores: o.valores })),
         status: publicar ? "publicado" : "rascunho",
         variantes,
+        imagens: dados.fotos,
+        postId: id ? undefined : postId,
       },
       id ?? undefined,
     );

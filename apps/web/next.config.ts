@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@fenicia/core", "@fenicia/db"],
   // Postgres embutido (só usado no PC); fica fora do bundle
   serverExternalPackages: ["@electric-sql/pglite"],
+  experimental: {
+    // fotos chegam já reduzidas no celular (~200 KB), mas deixamos folga
+    serverActions: { bodySizeLimit: "4mb" },
+  },
   turbopack: {
     rules: {
       "*.css": {

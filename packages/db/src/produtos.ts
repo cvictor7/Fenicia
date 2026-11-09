@@ -1,6 +1,16 @@
 import { chaveAtributos, gerarSlug, podePublicar } from "@fenicia/core";
 import { and, asc, desc, eq, ilike, like, ne, or, sql } from "drizzle-orm";
-import { categoria, movimentoEstoque, produto, variante, type AtributosVariante, type OpcaoProduto } from "./schema";
+import {
+  categoria,
+  imagemProduto,
+  movimentoEstoque,
+  post,
+  produto,
+  variante,
+  type AtributosVariante,
+  type FotoEnviada,
+  type OpcaoProduto,
+} from "./schema";
 import type { Banco } from "./tipos";
 
 export class ErroProduto extends Error {}
@@ -15,6 +25,10 @@ export type DadosProduto = {
   opcoes: OpcaoProduto[];
   status: "rascunho" | "publicado";
   variantes: { atributos: AtributosVariante; precoCentavos: number | null; estoque: number | null }[];
+  /** fotos na ordem em que aparecem (a primeira é a capa); undefined = não mexer */
+  imagens?: FotoEnviada[];
+  /** post de onde o produto saiu ("o post vira produto") */
+  postId?: string | null;
 };
 
 /** Lista com estoque somado e número de variações, para a tela de produtos. */
@@ -41,6 +55,7 @@ export async function listarProdutosResumo(
       atualizadoEm: produto.atualizadoEm,
       estoque,
       variacoes: sql<number>`count(${variante.id})::int`,
+      capa: sql<string | null>`(select ${imagemProduto.url} from ${imagemProduto} where ${imagemProduto.produtoId} = ${produto.id} order by ${imagemProduto.ordem} limit 1)`,
     })
     .from(produto)
     .leftJoin(variante, and(eq(variante.produtoId, produto.id), eq(variante.ativo, true)))
@@ -73,7 +88,12 @@ export async function buscarProdutoCompleto(db: Banco, lojaId: string, id: strin
     .from(variante)
     .where(and(eq(variante.produtoId, id), eq(variante.ativo, true)))
     .orderBy(asc(variante.id));
-  return { ...achado, variantes };
+  const imagens = await db
+    .select()
+    .from(imagemProduto)
+    .where(eq(imagemProduto.produtoId, id))
+    .orderBy(asc(imagemProduto.ordem));
+  return { ...achado, variantes, imagens };
 }
 
 /** Link único dentro da loja: "vestido", "vestido-2", "vestido-3"... */
@@ -135,8 +155,38 @@ export async function salvarProduto(
       if (!atualizado) throw new ErroProduto("Produto não encontrado.");
       salvo = atualizado;
     } else {
+      if (dados.postId) {
+        const [origem] = await tx
+          .select({ id: post.id })
+          .from(post)
+          .where(and(eq(post.lojaId, lojaId), eq(post.id, dados.postId)));
+        if (!origem) throw new ErroProduto("Post não encontrado.");
+      }
       const slug = await slugLivre(tx as unknown as Banco, lojaId, dados.nome);
-      [salvo] = await tx.insert(produto).values({ ...campos, lojaId, slug }).returning();
+      [salvo] = await tx
+        .insert(produto)
+        .values({ ...campos, lojaId, slug, postId: dados.postId ?? null })
+        .returning();
+      if (dados.postId) {
+        await tx.update(post).set({ status: "aprovado" }).where(eq(post.id, dados.postId));
+      }
+    }
+
+    if (dados.imagens) {
+      await tx.delete(imagemProduto).where(eq(imagemProduto.produtoId, salvo.id));
+      if (dados.imagens.length) {
+        await tx.insert(imagemProduto).values(
+          dados.imagens.map((foto, ordem) => ({
+            lojaId,
+            produtoId: salvo.id,
+            chave: foto.chave,
+            url: foto.url,
+            largura: foto.largura,
+            altura: foto.altura,
+            ordem,
+          })),
+        );
+      }
     }
 
     const existentes = await tx.select().from(variante).where(eq(variante.produtoId, salvo.id));

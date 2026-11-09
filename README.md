@@ -58,3 +58,12 @@ packages/db     banco (Drizzle + Neon): tabelas, migrações e acesso por loja
 - Sem preço, o produto fica em rascunho: não publica (regra no código e no banco).
 - Toda mudança de estoque vira uma linha no histórico (`movimento_estoque`). Variação removida fica inativa, para não perder o histórico.
 - Ações que não dá para desfazer (sair, arquivar) pedem confirmação.
+
+## Novo post (o post vira produto)
+
+1. O lojista sobe as fotos e cola a legenda, do jeito que postaria no Instagram.
+2. As fotos são reduzidas no próprio celular (~200 KB) e vão para o Vercel Blob, numa pasta da loja.
+3. O Gemini lê fotos + legenda e devolve JSON num formato fixo (nome, categoria, descrição, preço, variações).
+4. A resposta passa por `conferirSugestao`: preço que não está escrito na legenda é descartado. Estoque nunca é sugerido.
+5. Se o Gemini falhar ou não estiver configurado, entra a leitura simples (regras na legenda), com a mesma conferência.
+6. O lojista confere numa tela que mostra de onde veio cada campo e aprova.
