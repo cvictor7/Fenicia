@@ -2,12 +2,16 @@
   "name": "fenicia",
   "private": true,
   "packageManager": "pnpm@10.28.0",
-  "engines": { "node": ">=20.9" },
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "db:migrar": "pnpm --filter @fenicia/db db:migrar",
+    "db:gerar": "pnpm --filter @fenicia/db db:gerar"
   }
 }

@@ -1,0 +1,117 @@
+import { fileURLToPath } from "node:url";
+import { PGlite } from "@electric-sql/pglite";
+import { drizzle } from "drizzle-orm/pglite";
+import { migrate } from "drizzle-orm/pglite/migrator";
+import { beforeEach, describe, expect, it } from "vitest";
+import { daLoja } from "./escopo";
+import * as schema from "./schema";
+import { plantarSemente } from "./semente";
+import type { Banco } from "./tipos";
+
+/**
+ * Cada teste roda num Postgres de verdade, só que embutido (PGlite), criado do zero
+ * com as mesmas migrações do Neon. Não precisa de internet nem de senha: roda igual no CI.
+ */
+let db: Banco;
+
+beforeEach(async () => {
+  const pg = new PGlite();
+  const banco = drizzle(pg, { schema });
+  await migrate(banco, {
+    migrationsFolder: fileURLToPath(new URL("../drizzle", import.meta.url)),
+  });
+  db = banco as unknown as Banco;
+});
+
+async function criarLoja(slug: string) {
+  const [l] = await db.insert(schema.loja).values({ slug, nome: slug }).returning();
+  return l;
+}
+
+describe("isolamento entre lojas", () => {
+  it("cada loja só lista os próprios produtos", async () => {
+    const a = await criarLoja("loja-a");
+    const b = await criarLoja("loja-b");
+    await daLoja(db, a.id).criarProduto({ nome: "Vestido", slug: "vestido" });
+    await daLoja(db, b.id).criarProduto({ nome: "Bolo de pote", slug: "bolo" });
+
+    const deA = await daLoja(db, a.id).listarProdutos();
+    expect(deA.map((p) => p.nome)).toEqual(["Vestido"]);
+  });
+
+  it("loja A não encontra produto da loja B pelo id", async () => {
+    const a = await criarLoja("loja-a");
+    const b = await criarLoja("loja-b");
+    const daB = await daLoja(db, b.id).criarProduto({ nome: "Bolo", slug: "bolo" });
+
+    expect(await daLoja(db, a.id).buscarProduto(daB.id)).toBeNull();
+  });
+
+  it("loja A não consegue alterar produto da loja B", async () => {
+    const a = await criarLoja("loja-a");
+    const b = await criarLoja("loja-b");
+    const daB = await daLoja(db, b.id).criarProduto({ nome: "Bolo", slug: "bolo" });
+
+    const resultado = await daLoja(db, a.id).atualizarProduto(daB.id, { nome: "Hackeado" });
+    expect(resultado).toBeNull();
+    expect((await daLoja(db, b.id).buscarProduto(daB.id))?.nome).toBe("Bolo");
+  });
+
+  it("o mesmo slug pode existir em lojas diferentes, mas não na mesma loja", async () => {
+    const a = await criarLoja("loja-a");
+    const b = await criarLoja("loja-b");
+    await daLoja(db, a.id).criarProduto({ nome: "Camiseta", slug: "camiseta" });
+    await daLoja(db, b.id).criarProduto({ nome: "Camiseta", slug: "camiseta" });
+
+    await expect(
+      daLoja(db, a.id).criarProduto({ nome: "Outra", slug: "camiseta" }),
+    ).rejects.toThrow();
+  });
+});
+
+describe("regras gravadas no banco", () => {
+  it("produto sem preço não pode ser publicado", async () => {
+    const a = await criarLoja("loja-a");
+    await expect(
+      daLoja(db, a.id).criarProduto({ nome: "Sem preço", slug: "x", status: "publicado" }),
+    ).rejects.toThrow();
+  });
+
+  it("produto sem preço pode ficar em rascunho", async () => {
+    const a = await criarLoja("loja-a");
+    const p = await daLoja(db, a.id).criarProduto({ nome: "Rascunho", slug: "x" });
+    expect(p.precoCentavos).toBeNull();
+    expect(p.status).toBe("rascunho");
+  });
+
+  it("estoque não fica negativo", async () => {
+    const a = await criarLoja("loja-a");
+    const p = await daLoja(db, a.id).criarProduto({ nome: "Vestido", slug: "v" });
+    await expect(
+      db.insert(schema.variante).values({
+        lojaId: a.id,
+        produtoId: p.id,
+        atributos: { Tamanho: "M" },
+        estoque: -1,
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("não deixa cadastrar a mesma variação duas vezes", async () => {
+    const a = await criarLoja("loja-a");
+    const p = await daLoja(db, a.id).criarProduto({ nome: "Vestido", slug: "v" });
+    const linha = { lojaId: a.id, produtoId: p.id, atributos: { Tamanho: "M", Cor: "Preto" } };
+    await db.insert(schema.variante).values(linha);
+    await expect(db.insert(schema.variante).values(linha)).rejects.toThrow();
+  });
+});
+
+describe("semente", () => {
+  it("cria a loja demo uma vez só, mesmo rodando duas vezes", async () => {
+    const primeira = await plantarSemente(db);
+    const segunda = await plantarSemente(db);
+    expect(primeira.criada).toBe(true);
+    expect(segunda.criada).toBe(false);
+    expect(await daLoja(db, primeira.lojaId).listarCategorias()).toHaveLength(2);
+  });
+});

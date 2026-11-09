@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm --dir ../.. db:migrar && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fenicia/core": "workspace:*",
+    "@fenicia/db": "workspace:*",
+    "drizzle-orm": "^0.45.4",
     "next": "16.4.5",
     "react": "19.3.0",
     "react-dom": "19.3.0"
