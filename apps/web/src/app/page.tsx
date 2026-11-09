@@ -6,9 +6,9 @@ export default function Inicio() {
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10">
       <Logo tamanho={40} />
       <h1 className="mt-10 font-titulo text-4xl font-semibold leading-tight tracking-tight">
-        O post vira produto.
+        Você vende.
         <br />
-        A conversa vira venda.
+        A Fenícia organiza.
       </h1>
       <p className="mt-4 text-lg text-tinta-suave">
         Para quem vende pelo Instagram e pelo WhatsApp. Você continua vendendo do mesmo jeito; a

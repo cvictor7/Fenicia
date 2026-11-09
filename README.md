@@ -1,6 +1,6 @@
 # Fenícia
 
-Sistema para o pequeno lojista que vende pelo Instagram e pelo WhatsApp. O post vira produto, a conversa vira venda e um copiloto diz o que fazer.
+Sistema para o pequeno lojista que vende pelo Instagram e pelo WhatsApp. Você vende do mesmo jeito; a Fenícia organiza catálogo, estoque e pedidos, e um copiloto diz o que fazer.
 
 > Em construção. Fase 1: catálogo automático.
 

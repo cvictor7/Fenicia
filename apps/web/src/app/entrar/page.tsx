@@ -21,7 +21,7 @@ export default function PaginaEntrar() {
       </Suspense>
       <Logo tamanho={36} />
       <h1 className="mt-10 font-titulo text-3xl font-semibold tracking-tight">
-        O post vira produto.
+        Você vende. A Fenícia organiza.
       </h1>
       <p className="mt-2 text-tinta-suave">
         Entre para cuidar da sua loja: produtos, estoque e pedidos no mesmo lugar.

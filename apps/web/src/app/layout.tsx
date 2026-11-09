@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "Fenícia", template: "%s · Fenícia" },
-  description: "O post vira produto, a conversa vira venda.",
+  description: "Você vende. A Fenícia organiza. Catálogo, estoque e pedidos para quem vende pelo Instagram e WhatsApp.",
 };
 
 export const viewport: Viewport = {
