@@ -14,11 +14,11 @@
     "db:migrar": "tsx src/migrar.ts"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@neondatabase/serverless": "^1.2.0",
     "drizzle-orm": "^0.45.4"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.16",
     "@types/node": "^20.19.43",
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15",

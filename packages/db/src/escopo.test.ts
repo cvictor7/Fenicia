@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { daLoja } from "./escopo";
 import * as schema from "./schema";
 import { plantarSemente } from "./semente";
+import { criarLojaComDono, lojasDoUsuario, slugDisponivel } from "./usuarios";
 import type { Banco } from "./tipos";
 
 /**
@@ -113,5 +114,36 @@ describe("semente", () => {
     expect(primeira.criada).toBe(true);
     expect(segunda.criada).toBe(false);
     expect(await daLoja(db, primeira.lojaId).listarCategorias()).toHaveLength(2);
+  });
+});
+
+describe("usuário e loja", () => {
+  async function criarUsuario(id: string) {
+    await db.insert(schema.user).values({ id, name: id, email: `${id}@teste.com` });
+  }
+
+  it("cria a loja já com o usuário como dono", async () => {
+    await criarUsuario("u1");
+    const nova = await criarLojaComDono(db, "u1", { slug: "mare", nome: "Maré" });
+    const lojas = await lojasDoUsuario(db, "u1");
+    expect(lojas).toHaveLength(1);
+    expect(lojas[0].loja.id).toBe(nova.id);
+    expect(lojas[0].papel).toBe("dono");
+  });
+
+  it("usuário não vê loja de outro usuário", async () => {
+    await criarUsuario("u1");
+    await criarUsuario("u2");
+    await criarLojaComDono(db, "u1", { slug: "mare", nome: "Maré" });
+    expect(await lojasDoUsuario(db, "u2")).toHaveLength(0);
+  });
+
+  it("link repetido falha e não deixa loja sem dono para trás", async () => {
+    await criarUsuario("u1");
+    await criarUsuario("u2");
+    await criarLojaComDono(db, "u1", { slug: "mare", nome: "Maré" });
+    expect(await slugDisponivel(db, "mare")).toBe(false);
+    await expect(criarLojaComDono(db, "u2", { slug: "mare", nome: "Outra" })).rejects.toThrow();
+    expect(await lojasDoUsuario(db, "u2")).toHaveLength(0);
   });
 });

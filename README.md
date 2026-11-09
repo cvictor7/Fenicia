@@ -13,6 +13,13 @@ pnpm dev
 
 Abra http://localhost:3000
 
+Sem internet ou sem o Neon, dá para rodar com um banco local (Postgres embutido, criado sozinho):
+
+```powershell
+$env:DATABASE_URL = "pglite:./.banco-local"
+pnpm dev
+```
+
 ## Estrutura
 
 ```
@@ -38,3 +45,9 @@ packages/db     banco (Drizzle + Neon): tabelas, migrações e acesso por loja
 - Toda tabela de negócio tem `loja_id`. O acesso passa sempre por `daLoja(db, lojaId)`, e um teste garante que uma loja nunca lê nem altera dado de outra.
 - Os testes usam PGlite (Postgres embutido): rodam no CI sem internet e sem senha.
 - `GET /api/saude` mostra se o site está conectado ao banco.
+
+## Login
+
+- Better Auth com e-mail e senha (senha guardada com hash, sessão em cookie).
+- Cada usuário é ligado à loja pela tabela `membro_loja` (papel `dono` ou `atendente`).
+- Fluxo: `/entrar` → criar conta → `/painel/criar-loja` → `/painel`.

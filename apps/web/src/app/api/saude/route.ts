@@ -1,4 +1,4 @@
-import { criarBanco, loja } from "@fenicia/db";
+import { loja, obterBanco } from "@fenicia/db";
 import { sql } from "drizzle-orm";
 import { connection } from "next/server";
 
@@ -12,14 +12,11 @@ export async function GET() {
   if (!process.env.DATABASE_URL) {
     return Response.json({ ok: false, banco: "não configurado" }, { status: 503 });
   }
-
-  const { db, pool } = criarBanco();
   try {
+    const db = await obterBanco();
     const [linha] = await db.select({ total: sql<number>`count(*)::int` }).from(loja);
     return Response.json({ ok: true, banco: "conectado", lojas: linha.total });
   } catch {
     return Response.json({ ok: false, banco: "erro ao consultar" }, { status: 503 });
-  } finally {
-    await pool.end();
   }
 }

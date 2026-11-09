@@ -1,26 +1,36 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Identidade da Fenícia: púrpura de Tiro + alfabeto fenício */
+@theme {
+  --color-purpura-950: #2a0820;
+  --color-purpura-900: #3a0e2e;
+  --color-purpura-700: #5e1a4a;
+  --color-purpura-500: #b84a8c;
+  --color-purpura-100: #f3e6ee;
+  --color-areia: #f7f6f4;
+  --color-tinta: #2a1a24;
+  --color-tinta-suave: #6b5562;
+  --color-linha: #e2d9de;
+  --color-erro: #a33a2d;
+
+  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-titulo: "Bricolage Grotesque Variable", var(--font-sans);
+  --font-fenicio: "Noto Sans Phoenician", serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-areia);
+  color: var(--color-tinta);
+  font-family: var(--font-sans);
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
 }

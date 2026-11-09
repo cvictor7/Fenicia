@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // os pacotes do monorepo são TypeScript puro; o Next compila eles junto com o app
   transpilePackages: ["@fenicia/core", "@fenicia/db"],
+  // Postgres embutido (só usado no PC); fica fora do bundle
+  serverExternalPackages: ["@electric-sql/pglite"],
   turbopack: {
     rules: {
       "*.css": {

@@ -1,16 +1,26 @@
-import { formatarCentavos } from "@fenicia/core";
+import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 export default function Inicio() {
   return (
-    <main className="grid min-h-dvh place-items-center bg-[#3A0E2E] p-6 text-[#F3E6EE]">
-      <div className="max-w-md text-center">
-        <p className="text-sm text-[#D9B8CC]">etapa 0</p>
-        <h1 className="mt-2 text-4xl font-semibold">Olá, Fenícia</h1>
-        <p className="mt-4 text-[#E8D3DF]">
-          O post vira produto. Teste do pacote core:{" "}
-          <span className="whitespace-nowrap">{formatarCentavos(8990)}</span>
-        </p>
-      </div>
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10">
+      <Logo tamanho={40} />
+      <h1 className="mt-10 font-titulo text-4xl font-semibold leading-tight tracking-tight">
+        O post vira produto.
+        <br />
+        A conversa vira venda.
+      </h1>
+      <p className="mt-4 text-lg text-tinta-suave">
+        Para quem vende pelo Instagram e pelo WhatsApp. Você continua vendendo do mesmo jeito; a
+        Fenícia cuida do catálogo, do estoque e dos pedidos.
+      </p>
+      <Link
+        href="/entrar"
+        className="mt-8 flex h-12 items-center justify-center rounded-xl bg-purpura-700 font-medium text-purpura-100"
+      >
+        Entrar no painel
+      </Link>
+      <p className="mt-6 text-center text-sm text-tinta-suave">Em construção · Fase 1</p>
     </main>
   );
 }
