@@ -1,11 +1,8 @@
-import { fileURLToPath } from "node:url";
-import { PGlite } from "@electric-sql/pglite";
-import { drizzle } from "drizzle-orm/pglite";
-import { migrate } from "drizzle-orm/pglite/migrator";
 import { beforeEach, describe, expect, it } from "vitest";
 import { daLoja } from "./escopo";
 import * as schema from "./schema";
 import { plantarSemente } from "./semente";
+import { bancoDeTeste } from "./teste-banco";
 import { criarLojaComDono, lojasDoUsuario, slugDisponivel } from "./usuarios";
 import type { Banco } from "./tipos";
 
@@ -16,12 +13,7 @@ import type { Banco } from "./tipos";
 let db: Banco;
 
 beforeEach(async () => {
-  const pg = new PGlite();
-  const banco = drizzle(pg, { schema });
-  await migrate(banco, {
-    migrationsFolder: fileURLToPath(new URL("../drizzle", import.meta.url)),
-  });
-  db = banco as unknown as Banco;
+  db = await bancoDeTeste();
 });
 
 async function criarLoja(slug: string) {

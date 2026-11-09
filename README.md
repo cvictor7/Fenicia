@@ -51,3 +51,10 @@ packages/db     banco (Drizzle + Neon): tabelas, migrações e acesso por loja
 - Better Auth com e-mail e senha (senha guardada com hash, sessão em cookie).
 - Cada usuário é ligado à loja pela tabela `membro_loja` (papel `dono` ou `atendente`).
 - Fluxo: `/entrar` → criar conta → `/painel/criar-loja` → `/painel`.
+
+## Produtos
+
+- Cadastro com variações (tamanho, cor, sabor...). As combinações são geradas sozinhas, cada uma com estoque e, se quiser, preço próprio.
+- Sem preço, o produto fica em rascunho: não publica (regra no código e no banco).
+- Toda mudança de estoque vira uma linha no histórico (`movimento_estoque`). Variação removida fica inativa, para não perder o histórico.
+- Ações que não dá para desfazer (sair, arquivar) pedem confirmação.

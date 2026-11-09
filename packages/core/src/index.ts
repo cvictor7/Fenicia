@@ -7,3 +7,17 @@ export {
   validarSlug,
   type ResultadoValidacao,
 } from "./loja";
+export {
+  LIMITE_OPCOES,
+  LIMITE_VARIACOES,
+  centavosParaCampo,
+  chaveAtributos,
+  combinarOpcoes,
+  converterPrecoDigitado,
+  estoqueTotal,
+  nomeVariacao,
+  podePublicar,
+  validarOpcoes,
+  type Atributos,
+  type Opcao,
+} from "./produto";
