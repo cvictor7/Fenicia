@@ -1,0 +1,22 @@
+# dependencias
+node_modules/
+
+# builds
+.next/
+out/
+dist/
+.turbo/
+coverage/
+
+# variaveis de ambiente (NUNCA subir)
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel/
+
+# sistema e logs
+*.log
+.DS_Store
+Thumbs.db
