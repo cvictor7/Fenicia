@@ -15,6 +15,7 @@ import {
   obterOuCriarCategoria,
   salvarProduto,
 } from "@fenicia/db";
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { obterContexto } from "@/lib/contexto";
@@ -121,11 +122,13 @@ export async function salvarProdutoAcao(
     if (erro instanceof ErroProduto) return { erro: erro.message };
     throw erro;
   }
+  updateTag(`vitrine:${loja.slug}`); // a vitrine pública mostra a mudança na hora
   redirect("/painel/produtos");
 }
 
 export async function arquivarProdutoAcao(id: string) {
   const { loja } = await obterContexto();
   await arquivarProduto(await obterBanco(), loja.id, id);
+  updateTag(`vitrine:${loja.slug}`);
   redirect("/painel/produtos");
 }

@@ -67,3 +67,22 @@ packages/db     banco (Drizzle + Neon): tabelas, migrações e acesso por loja
 4. A resposta passa por `conferirSugestao`: preço que não está escrito na legenda é descartado. Estoque nunca é sugerido.
 5. Se o Gemini falhar ou não estiver configurado, entra a leitura simples (regras na legenda), com a mesma conferência.
 6. O lojista confere numa tela que mostra de onde veio cada campo e aprova.
+
+## Estoque
+
+- Botões de + e − por variação; o número muda na hora e o servidor confirma (se recusar, volta).
+- O `UPDATE` confere "não fica negativo" na mesma instrução: dois celulares tirando a última peça ao mesmo tempo não deixam o estoque em −1.
+- Cada toque vira uma linha no histórico (entrada, venda, perda ou ajuste).
+
+## Vitrine pública (link da bio)
+
+- `/<loja>`: grade de produtos com filtro por categoria, botões de WhatsApp e Instagram, na cor da loja.
+- `/<loja>/<produto>`: fotos, escolha de variação (esgotada aparece riscada), "últimas unidades" sem revelar a quantidade.
+- Páginas em cache (`"use cache"` + `cacheTag`): abrem na hora e não consultam o banco a cada visita. Quando o lojista salva um produto ou mexe no estoque, `updateTag` refaz o cache na hora.
+
+## Pedido pelo WhatsApp
+
+- A sacola fica no navegador do cliente; não precisa de cadastro.
+- Ao pedir, o servidor confere tudo no banco (preço, produto publicado, estoque), cria o pedido com número sequencial por loja (`#0001`) e devolve o link do WhatsApp com a mensagem pronta.
+- O item guarda uma cópia do nome e do preço: o pedido continua certo mesmo se o produto mudar.
+- Campo escondido contra robôs de spam.

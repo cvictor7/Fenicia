@@ -98,7 +98,9 @@ export async function buscarProdutoCompleto(db: Banco, lojaId: string, id: strin
 
 /** Link único dentro da loja: "vestido", "vestido-2", "vestido-3"... */
 async function slugLivre(db: Banco, lojaId: string, nome: string) {
-  const base = gerarSlug(nome) || "produto";
+  let base = gerarSlug(nome) || "produto";
+  // endereços que a vitrine usa para outras páginas
+  if (["sacola", "pedido"].includes(base)) base = `${base}-produto`;
   const usados = await db
     .select({ slug: produto.slug })
     .from(produto)

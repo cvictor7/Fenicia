@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { ExternalLink, LogOut } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CabecalhoLoja, Carregando } from "@/components/cabecalho-loja";
@@ -25,6 +25,13 @@ async function DadosLoja() {
   return (
     <>
       <CabecalhoLoja nome={loja.nome} slug={loja.slug} />
+      <a
+        href={`/${loja.slug}`}
+        target="_blank"
+        className="mt-5 flex h-12 items-center justify-center gap-2 rounded-xl bg-purpura-700 font-medium text-purpura-100"
+      >
+        Ver minha vitrine <ExternalLink size={16} aria-hidden="true" />
+      </a>
       <dl className="mt-6 divide-y divide-linha rounded-2xl border border-linha bg-white">
         {linhas.map(([rotulo, valor]) => (
           <div key={rotulo} className="flex items-center justify-between gap-4 px-4 py-3.5">

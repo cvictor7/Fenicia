@@ -23,6 +23,11 @@ describe("combinarOpcoes", () => {
     expect(combinarOpcoes([])).toEqual([{}]);
     expect(nomeVariacao({})).toBe("Única");
   });
+  it("nome da variação segue a ordem das opções, não a do JSON", () => {
+    expect(nomeVariacao({ Cor: "Preto", Tamanho: "M" })).toBe("M · Preto");
+    expect(nomeVariacao({ Cor: "Preto", Tamanho: "M" }, ["Cor", "Tamanho"])).toBe("Preto · M");
+    expect(nomeVariacao({ Voltagem: "220V", Acabamento: "Fosco" })).toBe("220V · Fosco");
+  });
   it("ignora opção sem valores", () => {
     expect(combinarOpcoes([{ nome: "Sabor", valores: [] }])).toEqual([{}]);
   });

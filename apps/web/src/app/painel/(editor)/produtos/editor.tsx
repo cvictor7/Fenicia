@@ -116,9 +116,16 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
         <h1 className="font-titulo text-xl font-semibold tracking-tight">
           {id ? "Editar produto" : postId ? "Confira o produto" : "Novo produto"}
         </h1>
-        {publicado ? (
-          <span className="ml-auto rounded-md bg-[#e3f1ea] px-2 py-0.5 text-xs text-[#0f6e56]">Publicado</span>
-        ) : null}
+        <div className="ml-auto flex items-center gap-2">
+          {publicado ? (
+            <span className="rounded-md bg-[#e3f1ea] px-2 py-0.5 text-xs text-[#0f6e56]">Publicado</span>
+          ) : null}
+          {id ? (
+            <Link href={`/painel/produtos/${id}/estoque`} className="h-9 rounded-lg border border-linha px-3 text-sm leading-9">
+              Estoque
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       {estado.erro ? (
@@ -322,7 +329,7 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
           {combinacoes.map((atributos) => {
             const chave = chaveAtributos(atributos);
             const linha = linhas[chave] ?? { estoque: "", preco: "" };
-            const rotulo = nomeVariacao(atributos);
+            const rotulo = nomeVariacao(atributos, opcoes.map((o) => o.nome.trim()));
             return (
               <li key={chave} className="flex items-center gap-2 px-3.5 py-2.5">
                 <span className="min-w-0 flex-1 truncate font-medium">{rotulo}</span>

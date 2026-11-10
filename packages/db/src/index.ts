@@ -17,3 +17,12 @@ export {
   type FiltroProdutos,
 } from "./produtos";
 export { buscarPost, criarPost, registrarLeitura } from "./posts";
+export { movimentarEstoque } from "./estoque";
+export { lojaPorSlug, produtoDaVitrine, produtosDaVitrine } from "./vitrine";
+export {
+  ErroPedido,
+  contarPedidosNovos,
+  criarPedido,
+  listarPedidos,
+  type ItemPedidoEntrada,
+} from "./pedidos";

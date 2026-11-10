@@ -33,10 +33,22 @@ export function chaveAtributos(atributos: Atributos): string {
     .join("|");
 }
 
-/** "M · Preto" (ou "Única" quando o produto não tem variações). */
-export function nomeVariacao(atributos: Atributos): string {
-  const valores = Object.values(atributos);
-  return valores.length ? valores.join(" · ") : "Única";
+const PRIORIDADE = ["tamanho", "cor", "sabor", "modelo", "voltagem"];
+
+/**
+ * "M · Preto" (ou "Única" quando o produto não tem variações).
+ * O Postgres guarda o JSON com as chaves reordenadas, então a ordem vem das opções do produto
+ * quando informadas; senão segue Tamanho, Cor, Sabor... e o resto em ordem alfabética.
+ */
+export function nomeVariacao(atributos: Atributos, ordem?: string[]): string {
+  const peso = (chave: string) => {
+    const naOrdem = ordem?.indexOf(chave) ?? -1;
+    if (naOrdem >= 0) return naOrdem;
+    const prioridade = PRIORIDADE.indexOf(chave.toLowerCase());
+    return 100 + (prioridade >= 0 ? prioridade : PRIORIDADE.length);
+  };
+  const chaves = Object.keys(atributos).sort((a, b) => peso(a) - peso(b) || a.localeCompare(b));
+  return chaves.length ? chaves.map((k) => atributos[k]).join(" · ") : "Única";
 }
 
 export function validarOpcoes(opcoes: Opcao[]): string | null {

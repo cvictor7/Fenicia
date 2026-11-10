@@ -1,4 +1,4 @@
-import { resumoProdutos, obterBanco } from "@fenicia/db";
+import { contarPedidosNovos, resumoProdutos, obterBanco } from "@fenicia/db";
 import { Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -10,14 +10,18 @@ export const metadata: Metadata = { title: "Painel" };
 
 async function Inicio() {
   const { loja, usuario } = await obterContexto();
-  const resumo = await resumoProdutos(await obterBanco(), loja.id);
+  const db = await obterBanco();
+  const [resumo, pedidosNovos] = await Promise.all([
+    resumoProdutos(db, loja.id),
+    contarPedidosNovos(db, loja.id),
+  ]);
   const primeiroNome = usuario.name.split(" ")[0];
 
   const cartoes = [
     { rotulo: "Produtos", valor: resumo.total, href: "/painel/produtos" },
     { rotulo: "Publicados", valor: resumo.publicados, href: "/painel/produtos?filtro=publicados" },
     { rotulo: "Sem estoque", valor: resumo.semEstoque, href: "/painel/produtos?filtro=sem-estoque", alerta: resumo.semEstoque > 0 },
-    { rotulo: "Pedidos novos", valor: 0, href: "/painel/pedidos" },
+    { rotulo: "Pedidos novos", valor: pedidosNovos, href: "/painel/pedidos" },
   ];
 
   return (
