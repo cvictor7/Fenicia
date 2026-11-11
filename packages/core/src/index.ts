@@ -35,3 +35,11 @@ export {
   totalPedido,
   type ItemMensagem,
 } from "./pedido";
+export {
+  ACAO_STATUS,
+  ROTULO_STATUS,
+  podeCancelar,
+  proximoStatus,
+  transicaoPermitida,
+  type StatusPedido,
+} from "./status-pedido";

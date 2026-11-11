@@ -86,3 +86,10 @@ packages/db     banco (Drizzle + Neon): tabelas, migrações e acesso por loja
 - Ao pedir, o servidor confere tudo no banco (preço, produto publicado, estoque), cria o pedido com número sequencial por loja (`#0001`) e devolve o link do WhatsApp com a mensagem pronta.
 - O item guarda uma cópia do nome e do preço: o pedido continua certo mesmo se o produto mudar.
 - Campo escondido contra robôs de spam.
+
+## Pedidos no painel
+
+- Abas Novos, Em andamento e Concluídos.
+- Caminho: novo → confirmado → pago → enviado → entregue. Dá para cancelar antes de enviar.
+- **Confirmar baixa o estoque** de todos os itens numa transação, com o pedido travado (`FOR UPDATE`): dois toques ao mesmo tempo não baixam duas vezes. Se faltar estoque, nada muda e a tela diz qual item.
+- **Cancelar devolve** exatamente o que aquele pedido baixou (o histórico de estoque guarda o `pedido_id`).

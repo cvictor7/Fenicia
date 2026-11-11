@@ -49,7 +49,7 @@ export function BotaoConfirmar({ acao, titulo, texto, rotuloConfirmar, perigo, c
                 disabled={rodando}
                 className="h-11 rounded-xl border border-linha font-medium"
               >
-                Cancelar
+                Voltar
               </button>
               <button
                 type="button"

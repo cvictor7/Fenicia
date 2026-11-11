@@ -1,6 +1,6 @@
-import { nomeVariacao, totalPedido } from "@fenicia/core";
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { pedido, pedidoItem, produto, variante } from "./schema";
+import { ROTULO_STATUS, nomeVariacao, totalPedido, transicaoPermitida, type StatusPedido } from "@fenicia/core";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { movimentoEstoque, pedido, pedidoItem, produto, variante } from "./schema";
 import type { Banco } from "./tipos";
 
 export class ErroPedido extends Error {}
@@ -122,4 +122,106 @@ export async function contarPedidosNovos(db: Banco, lojaId: string) {
     .from(pedido)
     .where(and(eq(pedido.lojaId, lojaId), eq(pedido.status, "novo")));
   return total;
+}
+
+/**
+ * Muda o status do pedido seguindo o caminho permitido.
+ * - novo → confirmado: baixa o estoque de cada item (motivo "venda", ligado ao pedido).
+ *   Se faltar estoque em algum item, nada muda e o erro diz qual.
+ *   Variação com estoque não informado não é baixada.
+ * - cancelar um pedido que já baixou estoque: devolve exatamente o que foi baixado.
+ * Tudo numa transação, com o pedido travado (FOR UPDATE): dois toques ao mesmo tempo
+ * não baixam o estoque duas vezes.
+ */
+export async function mudarStatusPedido(
+  db: Banco,
+  lojaId: string,
+  usuarioId: string,
+  pedidoId: string,
+  novoStatus: StatusPedido,
+) {
+  return db.transaction(async (tx) => {
+    const [atual] = await tx
+      .select()
+      .from(pedido)
+      .where(and(eq(pedido.id, pedidoId), eq(pedido.lojaId, lojaId)))
+      .for("update");
+    if (!atual) throw new ErroPedido("Pedido não encontrado.");
+    if (!transicaoPermitida(atual.status, novoStatus)) {
+      throw new ErroPedido(`Esse pedido está como "${ROTULO_STATUS[atual.status]}" e não pode ir para "${ROTULO_STATUS[novoStatus]}".`);
+    }
+
+    if (novoStatus === "confirmado") {
+      const itens = await tx.select().from(pedidoItem).where(eq(pedidoItem.pedidoId, pedidoId));
+      for (const item of itens) {
+        if (!item.varianteId) continue;
+        const [baixada] = await tx
+          .update(variante)
+          .set({ estoque: sql`${variante.estoque} - ${item.quantidade}` })
+          .where(
+            and(
+              eq(variante.id, item.varianteId),
+              eq(variante.lojaId, lojaId),
+              isNotNull(variante.estoque),
+              sql`${variante.estoque} - ${item.quantidade} >= 0`,
+            ),
+          )
+          .returning({ id: variante.id });
+
+        if (!baixada) {
+          const [v] = await tx
+            .select({ estoque: variante.estoque })
+            .from(variante)
+            .where(eq(variante.id, item.varianteId));
+          if (!v || v.estoque == null) continue; // estoque não informado: não controla
+          const nome = `${item.nomeSnapshot}${Object.keys(item.atributosSnapshot).length ? ` (${nomeVariacao(item.atributosSnapshot)})` : ""}`;
+          throw new ErroPedido(
+            v.estoque === 0 ? `${nome} está sem estoque.` : `Só tem ${v.estoque} de ${nome} no estoque.`,
+          );
+        }
+        await tx.insert(movimentoEstoque).values({
+          lojaId,
+          varianteId: item.varianteId,
+          quantidade: -item.quantidade,
+          motivo: "venda",
+          pedidoId,
+          usuarioId,
+        });
+      }
+    }
+
+    if (novoStatus === "cancelado") {
+      const baixas = await tx
+        .select({
+          varianteId: movimentoEstoque.varianteId,
+          total: sql<number>`sum(${movimentoEstoque.quantidade})::int`,
+        })
+        .from(movimentoEstoque)
+        .where(and(eq(movimentoEstoque.pedidoId, pedidoId), eq(movimentoEstoque.lojaId, lojaId)))
+        .groupBy(movimentoEstoque.varianteId);
+      for (const b of baixas) {
+        if (b.total >= 0) continue;
+        const devolver = -b.total;
+        await tx
+          .update(variante)
+          .set({ estoque: sql`coalesce(${variante.estoque}, 0) + ${devolver}` })
+          .where(eq(variante.id, b.varianteId));
+        await tx.insert(movimentoEstoque).values({
+          lojaId,
+          varianteId: b.varianteId,
+          quantidade: devolver,
+          motivo: "ajuste",
+          pedidoId,
+          usuarioId,
+        });
+      }
+    }
+
+    const [atualizado] = await tx
+      .update(pedido)
+      .set({ status: novoStatus })
+      .where(eq(pedido.id, pedidoId))
+      .returning();
+    return atualizado;
+  });
 }

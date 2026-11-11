@@ -24,5 +24,6 @@ export {
   contarPedidosNovos,
   criarPedido,
   listarPedidos,
+  mudarStatusPedido,
   type ItemPedidoEntrada,
 } from "./pedidos";
