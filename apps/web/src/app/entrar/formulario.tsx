@@ -6,8 +6,8 @@ import { criarConta, entrar, type EstadoAcesso } from "./acoes";
 
 const inicial: EstadoAcesso = {};
 
-export function FormularioAcesso() {
-  const [modo, setModo] = useState<"entrar" | "criar">("entrar");
+export function FormularioAcesso({ modoInicial = "entrar" }: { modoInicial?: "entrar" | "criar" }) {
+  const [modo, setModo] = useState<"entrar" | "criar">(modoInicial);
 
   return (
     <div>
