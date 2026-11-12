@@ -37,7 +37,7 @@ export function AcoesPedido({ pedidoId, status }: { pedidoId: string; status: St
             type="button"
             onClick={avancar}
             disabled={rodando}
-            className="h-11 flex-1 rounded-xl bg-purpura-700 text-sm font-medium text-purpura-100 disabled:opacity-70"
+            className="h-11 flex-1 rounded-full bg-purpura-700 text-sm font-semibold text-sobre-purpura disabled:opacity-70"
           >
             {rodando ? "Salvando…" : ACAO_STATUS[status]}
           </button>
@@ -53,7 +53,7 @@ export function AcoesPedido({ pedidoId, status }: { pedidoId: string; status: St
             }
             rotuloConfirmar="Cancelar pedido"
             perigo
-            className="h-11 rounded-xl border border-linha px-4 text-sm font-medium text-erro"
+            className="h-11 rounded-full px-4 text-sm font-semibold text-erro hover:bg-[#f8e4e1]"
           >
             Cancelar
           </BotaoConfirmar>

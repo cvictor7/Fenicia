@@ -35,10 +35,10 @@ export function BotaoConfirmar({ acao, titulo, texto, rotuloConfirmar, perigo, c
           onClick={() => !rodando && setAberto(false)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-white p-5"
+            className="w-full max-w-sm rounded-3xl bg-white p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <p id="confirmar-titulo" className="font-titulo text-lg font-semibold">
+            <p id="confirmar-titulo" className="font-titulo text-xl font-bold">
               {titulo}
             </p>
             {texto ? <p className="mt-1 text-sm text-tinta-suave">{texto}</p> : null}
@@ -47,7 +47,7 @@ export function BotaoConfirmar({ acao, titulo, texto, rotuloConfirmar, perigo, c
                 type="button"
                 onClick={() => setAberto(false)}
                 disabled={rodando}
-                className="h-11 rounded-xl border border-linha font-medium"
+                className="h-11 rounded-full border border-purpura-200 font-semibold"
               >
                 Voltar
               </button>
@@ -58,7 +58,7 @@ export function BotaoConfirmar({ acao, titulo, texto, rotuloConfirmar, perigo, c
                   await acao();
                   setAberto(false);
                 })}
-                className={`h-11 rounded-xl font-medium text-white disabled:opacity-70 ${
+                className={`h-11 rounded-full font-semibold text-white disabled:opacity-70 ${
                   perigo ? "bg-erro" : "bg-purpura-700"
                 }`}
               >

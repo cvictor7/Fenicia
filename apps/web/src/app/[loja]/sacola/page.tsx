@@ -17,7 +17,7 @@ async function ConteudoSacola({ params }: { params: Params }) {
 
 export default function PaginaSacola({ params }: { params: Params }) {
   return (
-    <main className="mx-auto max-w-md px-4 pb-32 pt-4">
+    <main className="mx-auto min-h-dvh max-w-md bg-white px-4 pb-32 pt-3">
       <Suspense fallback={null}>
         <ConteudoSacola params={params} />
       </Suspense>

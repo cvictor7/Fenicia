@@ -1,17 +1,18 @@
 import { formatarCentavos } from "@fenicia/core";
 import { listarProdutosResumo, obterBanco, type FiltroProdutos } from "@fenicia/db";
-import { ChevronRight, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Carregando, Vazio } from "@/components/cabecalho-loja";
+import { AcaoTopo, Topo } from "@/components/topo";
 import { obterContexto } from "@/lib/contexto";
 
 export const metadata: Metadata = { title: "Produtos" };
 
 const filtros: { valor: FiltroProdutos; rotulo: string }[] = [
   { valor: "todos", rotulo: "Todos" },
-  { valor: "publicados", rotulo: "Publicados" },
+  { valor: "publicados", rotulo: "Na vitrine" },
   { valor: "rascunhos", rotulo: "Rascunhos" },
   { valor: "sem-estoque", rotulo: "Sem estoque" },
   { valor: "arquivados", rotulo: "Arquivados" },
@@ -19,10 +20,11 @@ const filtros: { valor: FiltroProdutos; rotulo: string }[] = [
 
 type Params = Promise<{ filtro?: string; busca?: string }>;
 
-function textoEstoque(estoque: number | null) {
-  if (estoque == null) return { texto: "Estoque não informado", cor: "text-tinta-suave" };
-  if (estoque === 0) return { texto: "Sem estoque", cor: "text-erro" };
-  return { texto: `${estoque} em estoque`, cor: "text-tinta-suave" };
+function Estoque({ estoque }: { estoque: number | null }) {
+  if (estoque == null) return <span className="text-tinta-suave">estoque não informado</span>;
+  if (estoque === 0) return <span className="font-semibold text-erro">sem estoque</span>;
+  if (estoque <= 2) return <span className="font-semibold text-[#9a4a00]">restam {estoque}</span>;
+  return <span className="text-tinta-suave">{estoque} em estoque</span>;
 }
 
 async function Lista({ searchParams }: { searchParams: Params }) {
@@ -33,25 +35,35 @@ async function Lista({ searchParams }: { searchParams: Params }) {
 
   return (
     <>
-      <form className="relative mt-4" role="search">
-        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-tinta-suave" aria-hidden="true" />
-        {filtro !== "todos" ? <input type="hidden" name="filtro" value={filtro} /> : null}
-        <input
-          name="busca"
-          defaultValue={busca}
-          placeholder="Buscar produto"
-          aria-label="Buscar produto"
-          className="h-11 w-full rounded-xl border border-linha bg-white pl-10 pr-3 text-base outline-none focus:border-purpura-700"
-        />
-      </form>
+      <Topo
+        titulo="Produtos"
+        subtitulo={`${produtos.length} ${produtos.length === 1 ? "produto" : "produtos"}`}
+        acao={
+          <AcaoTopo href="/painel/produtos/novo">
+            <Plus size={16} aria-hidden="true" /> Novo
+          </AcaoTopo>
+        }
+      >
+        <form className="relative mt-5" role="search">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-sobre-purpura-suave" aria-hidden="true" />
+          {filtro !== "todos" ? <input type="hidden" name="filtro" value={filtro} /> : null}
+          <input
+            name="busca"
+            defaultValue={busca}
+            placeholder="Buscar produto"
+            aria-label="Buscar produto"
+            className="h-11 w-full rounded-full bg-white/12 pl-11 pr-4 text-base text-white outline-none placeholder:text-sobre-purpura-suave focus:bg-white/20"
+          />
+        </form>
+      </Topo>
 
-      <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
         {filtros.map((x) => (
           <Link
             key={x.valor}
             href={x.valor === "todos" ? "/painel/produtos" : `/painel/produtos?filtro=${x.valor}`}
             aria-current={filtro === x.valor ? "true" : undefined}
-            className="h-9 shrink-0 rounded-full border border-linha bg-white px-4 text-sm leading-9 aria-[current=true]:border-purpura-700 aria-[current=true]:bg-purpura-700 aria-[current=true]:text-purpura-100"
+            className="h-9 shrink-0 rounded-full border border-linha px-4 text-sm leading-[34px] aria-[current=true]:border-purpura-700 aria-[current=true]:bg-purpura-700 aria-[current=true]:font-semibold aria-[current=true]:text-sobre-purpura"
           >
             {x.rotulo}
           </Link>
@@ -59,48 +71,47 @@ async function Lista({ searchParams }: { searchParams: Params }) {
       </div>
 
       {produtos.length === 0 ? (
-        <div className="mt-5">
-          <Vazio
-            titulo={busca || filtro !== "todos" ? "Nada encontrado" : "Nenhum produto ainda"}
-            texto={busca || filtro !== "todos" ? "Tente outro filtro ou outra busca." : "Cadastre o primeiro produto da loja."}
-          />
-        </div>
+        <Vazio
+          titulo={busca || filtro !== "todos" ? "Nada encontrado" : "Nenhum produto ainda"}
+          texto={busca || filtro !== "todos" ? "Tente outro filtro ou outra busca." : "Suba um post do Instagram e a Fenícia monta o primeiro produto."}
+        >
+          {busca || filtro !== "todos" ? null : (
+            <Link href="/painel/novo-post" className="inline-flex h-11 items-center rounded-full bg-purpura-700 px-5 font-semibold text-sobre-purpura">
+              Subir um post
+            </Link>
+          )}
+        </Vazio>
       ) : (
-        <ul className="mt-4 divide-y divide-linha overflow-hidden rounded-2xl border border-linha bg-white">
-          {produtos.map((p) => {
-            const estoque = textoEstoque(p.estoque);
-            return (
-              <li key={p.id}>
-                <Link href={`/painel/produtos/${p.id}`} className="flex items-center gap-3 px-4 py-3.5 active:bg-purpura-100/40">
-                  {p.capa ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.capa} alt="" className="h-14 w-11 shrink-0 rounded-lg object-cover" loading="lazy" />
-                  ) : (
-                    <span aria-hidden="true" className="flex h-14 w-11 shrink-0 items-center justify-center rounded-lg bg-purpura-100 font-fenicio text-xl text-purpura-500">
-                      𐤀
+        <ul className="mt-3 divide-y divide-linha">
+          {produtos.map((p) => (
+            <li key={p.id}>
+              <Link href={`/painel/produtos/${p.id}`} className="flex items-center gap-3.5 py-3">
+                {p.capa ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.capa} alt="" className="h-[72px] w-14 shrink-0 rounded-md object-cover" loading="lazy" />
+                ) : (
+                  <span aria-hidden="true" className="flex h-[72px] w-14 shrink-0 items-center justify-center rounded-md bg-purpura-100 font-fenicio text-2xl text-purpura-500">
+                    𐤀
+                  </span>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-titulo text-[17px] font-bold leading-tight">{p.nome}</p>
+                  <p className="mt-1 text-sm">
+                    <span className="font-semibold tabular-nums">
+                      {p.precoCentavos != null ? formatarCentavos(p.precoCentavos) : "sem preço"}
                     </span>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate font-medium">{p.nome}</p>
-                      {p.status !== "publicado" ? (
-                        <span className="shrink-0 rounded-md bg-purpura-100 px-1.5 py-0.5 text-[11px] text-purpura-900">
-                          {p.status === "rascunho" ? "Rascunho" : "Arquivado"}
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-0.5 text-sm">
-                      <span>{p.precoCentavos != null ? formatarCentavos(p.precoCentavos) : "Sem preço"}</span>
-                      <span className="text-tinta-suave"> · </span>
-                      <span className={estoque.cor}>{estoque.texto}</span>
-                      {p.variacoes > 1 ? <span className="text-tinta-suave"> · {p.variacoes} variações</span> : null}
-                    </p>
-                  </div>
-                  <ChevronRight size={18} className="shrink-0 text-tinta-suave" aria-hidden="true" />
-                </Link>
-              </li>
-            );
-          })}
+                    <span className="text-tinta-suave">{p.variacoes > 1 ? ` · ${p.variacoes} variações` : ""}</span>
+                  </p>
+                  <p className="mt-0.5 text-sm">
+                    <Estoque estoque={p.estoque} />
+                    {p.status !== "publicado" ? (
+                      <span className="text-tinta-suave"> · {p.status === "rascunho" ? "rascunho" : "arquivado"}</span>
+                    ) : null}
+                  </p>
+                </div>
+              </Link>
+            </li>
+          ))}
         </ul>
       )}
     </>
@@ -109,16 +120,8 @@ async function Lista({ searchParams }: { searchParams: Params }) {
 
 export default function PaginaProdutos({ searchParams }: { searchParams: Params }) {
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <h1 className="font-titulo text-2xl font-semibold tracking-tight">Produtos</h1>
-        <Link href="/painel/produtos/novo" className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-purpura-700 px-4 text-sm font-medium text-purpura-100">
-          <Plus size={16} aria-hidden="true" /> Novo
-        </Link>
-      </div>
-      <Suspense fallback={<div className="mt-4"><Carregando /></div>}>
-        <Lista searchParams={searchParams} />
-      </Suspense>
-    </>
+    <Suspense fallback={<Carregando />}>
+      <Lista searchParams={searchParams} />
+    </Suspense>
   );
 }

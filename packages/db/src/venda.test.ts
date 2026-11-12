@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { movimentarEstoque } from "./estoque";
-import { contarPedidosNovos, criarPedido, listarPedidos, mudarStatusPedido } from "./pedidos";
+import { contarPedidosNovos, criarPedido, listarPedidos, mudarStatusPedido, resumoHoje } from "./pedidos";
 import { buscarProdutoCompleto, historicoEstoque, salvarProduto, type DadosProduto } from "./produtos";
 import * as schema from "./schema";
 import { bancoDeTeste } from "./teste-banco";
@@ -201,5 +201,24 @@ describe("mudarStatusPedido", () => {
       expect((await mudarStatusPedido(db, lojaId, "u1", pedidoId, s)).status).toBe(s);
     }
     await expect(mudarStatusPedido(db, lojaId, "u1", pedidoId, "cancelado")).rejects.toThrow();
+  });
+});
+
+describe("resumoHoje", () => {
+  it("conta novos e soma só o que foi confirmado no período", async () => {
+    const p = await salvarProduto(db, lojaId, "u1", vestido({
+      variantes: [
+        { atributos: { Tamanho: "P" }, precoCentavos: null, estoque: 5 },
+        { atributos: { Tamanho: "M" }, precoCentavos: null, estoque: 5 },
+      ],
+    }));
+    const { P } = await variantes(p.id);
+    const a = await criarPedido(db, lojaId, { itens: [{ varianteId: P.id, quantidade: 2 }] });
+    await criarPedido(db, lojaId, { itens: [{ varianteId: P.id, quantidade: 1 }] });
+    await mudarStatusPedido(db, lojaId, "u1", a.pedido.id, "confirmado");
+    const hoje = await resumoHoje(db, lojaId, new Date(Date.now() - 3_600_000));
+    expect(hoje).toEqual({ novos: 1, vendidoCentavos: 20000 });
+    const amanha = await resumoHoje(db, lojaId, new Date(Date.now() + 3_600_000));
+    expect(amanha.vendidoCentavos).toBe(0);
   });
 });

@@ -30,6 +30,7 @@ export {
 } from "./ia";
 export {
   formatarNumeroPedido,
+  inicioDoDia,
   linkWhatsapp,
   montarMensagemPedido,
   totalPedido,

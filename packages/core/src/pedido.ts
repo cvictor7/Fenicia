@@ -46,3 +46,14 @@ export function linkWhatsapp(numero: string, mensagem?: string): string {
 export function totalPedido(itens: { quantidade: number; precoUnitCentavos: number }[]): number {
   return itens.reduce((soma, i) => soma + i.quantidade * i.precoUnitCentavos, 0);
 }
+
+/**
+ * Meia-noite de hoje num fuso fixo (Manaus = UTC−4, sem horário de verão).
+ * Usado para somar "o que vendeu hoje".
+ */
+export function inicioDoDia(agora: Date, deslocamentoHoras = -4): Date {
+  const local = new Date(agora.getTime() + deslocamentoHoras * 3_600_000);
+  return new Date(
+    Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) - deslocamentoHoras * 3_600_000,
+  );
+}

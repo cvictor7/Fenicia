@@ -38,7 +38,7 @@ export function FormularioPost() {
       <button
         type="submit"
         disabled={lendo}
-        className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-purpura-700 font-medium text-purpura-100 disabled:opacity-70"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-purpura-700 font-semibold text-sobre-purpura disabled:opacity-70"
       >
         <Sparkles size={18} aria-hidden="true" />
         {lendo ? "Lendo o post…" : "Ler post"}

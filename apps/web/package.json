@@ -13,6 +13,7 @@
     "@fenicia/core": "workspace:*",
     "@fenicia/db": "workspace:*",
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource/instrument-sans": "^5.3.0",
     "@fontsource/noto-sans-phoenician": "^5.3.0",
     "@vercel/blob": "^2.9.0",
     "better-auth": "^1.7.18",

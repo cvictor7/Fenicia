@@ -1,6 +1,6 @@
 "use client";
 
-import { formatarCentavos, formatarNumeroPedido } from "@fenicia/core";
+import { formatarCentavos, formatarNumeroPedido, montarMensagemPedido } from "@fenicia/core";
 import { ArrowLeft, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
@@ -38,7 +38,7 @@ export function Sacola({ slug, nomeLoja, cor }: Props) {
   }
 
   const voltar = (
-    <Link href={`/${slug}`} className="-ml-2 inline-flex h-10 items-center gap-1 rounded-xl px-2 text-sm font-medium">
+    <Link href={`/${slug}`} className="-ml-2 inline-flex h-10 items-center gap-1 rounded-full px-2 text-[15px] font-semibold">
       <ArrowLeft size={18} aria-hidden="true" /> {nomeLoja}
     </Link>
   );
@@ -50,7 +50,7 @@ export function Sacola({ slug, nomeLoja, cor }: Props) {
         <div className="mt-10 text-center">
           <p className="font-titulo text-2xl font-semibold">Pedido {formatarNumeroPedido(feito.numero)} feito</p>
           <p className="mt-2 text-tinta-suave">Agora é só enviar a mensagem no WhatsApp da loja.</p>
-          <a href={feito.link} className="mt-6 inline-flex h-12 items-center rounded-xl px-6 font-medium text-white" style={{ background: cor }}>
+          <a href={feito.link} className="mt-6 inline-flex h-12 items-center rounded-full px-6 font-semibold text-white" style={{ background: cor }}>
             Abrir o WhatsApp
           </a>
         </div>
@@ -61,20 +61,20 @@ export function Sacola({ slug, nomeLoja, cor }: Props) {
   return (
     <>
       {voltar}
-      <h1 className="mt-3 font-titulo text-2xl font-semibold tracking-tight">Sua sacola</h1>
+      <h1 className="mt-2 font-titulo text-[26px] font-bold tracking-tight">Sua sacola</h1>
 
       {itens.length === 0 ? (
         <div className="mt-10 text-center">
           <p className="text-tinta-suave">A sacola está vazia.</p>
-          <Link href={`/${slug}`} className="mt-4 inline-flex h-11 items-center rounded-xl border border-linha bg-white px-5 font-medium">
+          <Link href={`/${slug}`} className="mt-4 inline-flex h-11 items-center rounded-full border border-linha bg-white px-5 font-semibold">
             Ver produtos
           </Link>
         </div>
       ) : (
         <>
-          <ul className="mt-4 divide-y divide-linha rounded-2xl border border-linha bg-white">
+          <ul className="mt-4 divide-y divide-linha">
             {itens.map((item) => (
-              <li key={item.varianteId} className="flex gap-3 p-3">
+              <li key={item.varianteId} className="flex gap-3 py-3">
                 {item.capa ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={item.capa} alt="" className="h-20 w-16 shrink-0 rounded-lg object-cover" />
@@ -87,7 +87,7 @@ export function Sacola({ slug, nomeLoja, cor }: Props) {
                   </Link>
                   {item.variacao ? <p className="text-sm text-tinta-suave">{item.variacao}</p> : null}
                   <div className="mt-2 flex items-center justify-between">
-                    <div className="flex items-center rounded-xl border border-linha">
+                    <div className="flex items-center rounded-full border border-linha">
                       <button
                         type="button"
                         onClick={() => mudarQuantidade(item.varianteId, item.quantidade - 1)}
@@ -143,9 +143,23 @@ export function Sacola({ slug, nomeLoja, cor }: Props) {
             />
           </div>
 
-          <p className="mt-5 text-sm text-tinta-suave">
-            Você combina pagamento e entrega direto com a loja, pelo WhatsApp.
-          </p>
+          <section className="mt-6" aria-label="Prévia da mensagem">
+            <p className="text-sm font-semibold">Mensagem que vai para a loja</p>
+            <div className="mt-2 rounded-2xl bg-[#e9e2d8] p-3">
+              <p className="ml-auto max-w-[88%] whitespace-pre-line rounded-[16px_4px_16px_16px] bg-[#d9fdd3] px-3 py-2 text-[14px] leading-snug text-[#111b21]">
+                {montarMensagemPedido({
+                  numero: 0,
+                  itens: itens.map((i) => ({ nome: i.nome, variacao: i.variacao, quantidade: i.quantidade, precoUnitCentavos: i.precoUnitCentavos })),
+                  totalCentavos,
+                  cliente: nome,
+                  observacao,
+                }).replace(" #0000", "")}
+              </p>
+            </div>
+            <p className="mt-2 text-sm text-tinta-suave">
+              O número do pedido entra na hora de enviar. Pagamento e entrega você combina com a loja.
+            </p>
+          </section>
           {erro ? <p role="alert" className="mt-3 rounded-xl bg-[#f8e4e1] px-3.5 py-3 text-sm text-erro">{erro}</p> : null}
 
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-linha bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
@@ -158,7 +172,7 @@ export function Sacola({ slug, nomeLoja, cor }: Props) {
                 type="button"
                 onClick={pedir}
                 disabled={enviando}
-                className="h-12 flex-1 rounded-xl font-medium text-white disabled:opacity-70"
+                className="h-12 flex-1 rounded-full font-semibold text-white disabled:opacity-70"
                 style={{ background: cor }}
               >
                 {enviando ? "Enviando…" : "Pedir no WhatsApp"}

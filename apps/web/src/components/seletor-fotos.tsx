@@ -76,7 +76,7 @@ export function SeletorFotos({ fotos, aoMudar, maximo = 6 }: Props) {
     <div>
       <div className="grid grid-cols-3 gap-2">
         {fotos.map((foto, i) => (
-          <div key={foto.chave} className="relative aspect-[4/5] overflow-hidden rounded-xl bg-linha/40">
+          <div key={foto.chave} className="relative aspect-[4/5] overflow-hidden rounded-md bg-linha/40">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={foto.url} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
             {i === 0 ? (
@@ -102,7 +102,7 @@ export function SeletorFotos({ fotos, aoMudar, maximo = 6 }: Props) {
           </div>
         ))}
         {Array.from({ length: enviando }, (_, i) => (
-          <div key={`enviando-${i}`} className="flex aspect-[4/5] animate-pulse items-center justify-center rounded-xl bg-purpura-100 text-xs text-purpura-700">
+          <div key={`enviando-${i}`} className="flex aspect-[4/5] animate-pulse items-center justify-center rounded-md bg-purpura-100 text-xs text-purpura-700">
             Enviando…
           </div>
         ))}
@@ -110,7 +110,7 @@ export function SeletorFotos({ fotos, aoMudar, maximo = 6 }: Props) {
           <button
             type="button"
             onClick={() => entrada.current?.click()}
-            className="flex aspect-[4/5] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-purpura-500 text-sm text-purpura-700"
+            className="flex aspect-[4/5] flex-col items-center justify-center gap-1.5 rounded-md border-2 border-dashed border-purpura-200 bg-white/60 text-sm text-purpura-700"
           >
             <ImagePlus size={22} aria-hidden="true" />
             {fotos.length ? "Mais fotos" : "Fotos"}

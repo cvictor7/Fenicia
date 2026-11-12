@@ -225,3 +225,15 @@ export async function mudarStatusPedido(
     return atualizado;
   });
 }
+
+/** Números do topo do Início: pedidos esperando e quanto vendeu desde `desde`. */
+export async function resumoHoje(db: Banco, lojaId: string, desde: Date) {
+  const [linha] = await db
+    .select({
+      novos: sql<number>`count(*) filter (where ${pedido.status} = 'novo')::int`,
+      vendidoCentavos: sql<number>`coalesce(sum(${pedido.totalCentavos}) filter (where ${pedido.status} in ('confirmado','pago','enviado','entregue') and ${pedido.criadoEm} >= ${desde.toISOString()}), 0)::int`,
+    })
+    .from(pedido)
+    .where(eq(pedido.lojaId, lojaId));
+  return linha;
+}

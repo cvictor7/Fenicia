@@ -8,10 +8,10 @@ import {
   formatarCentavos,
   nomeVariacao,
 } from "@fenicia/core";
-import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
-import Link from "next/link";
+import { Plus, Trash2, X } from "lucide-react";
 import { useActionState, useMemo, useState } from "react";
 import { BotaoConfirmar } from "@/components/confirmar";
+import { AcaoTopo, Topo } from "@/components/topo";
 import { SeletorFotos, type Foto } from "@/components/seletor-fotos";
 import { arquivarProdutoAcao, salvarProdutoAcao, type DadosEditor, type EstadoEditor } from "./acoes";
 
@@ -109,33 +109,21 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
     <form action={acao} noValidate>
       <input type="hidden" name="dados" value={JSON.stringify(dados)} />
 
-      <div className="flex items-center gap-2">
-        <Link href={postId ? "/painel/novo-post" : "/painel/produtos"} aria-label="Voltar" className="-ml-2 flex h-10 w-10 items-center justify-center rounded-xl hover:bg-purpura-100">
-          <ArrowLeft size={20} aria-hidden="true" />
-        </Link>
-        <h1 className="font-titulo text-xl font-semibold tracking-tight">
-          {id ? "Editar produto" : postId ? "Confira o produto" : "Novo produto"}
-        </h1>
-        <div className="ml-auto flex items-center gap-2">
-          {publicado ? (
-            <span className="rounded-md bg-[#e3f1ea] px-2 py-0.5 text-xs text-[#0f6e56]">Publicado</span>
-          ) : null}
-          {id ? (
-            <Link href={`/painel/produtos/${id}/estoque`} className="h-9 rounded-lg border border-linha px-3 text-sm leading-9">
-              Estoque
-            </Link>
-          ) : null}
-        </div>
-      </div>
+      <Topo
+        titulo={id ? nome || "Editar produto" : postId ? "Confira o produto" : "Novo produto"}
+        subtitulo={id ? (publicado ? "Na vitrine" : "Rascunho, fora da vitrine") : postId ? "Lido do seu post. Ajuste o que precisar." : undefined}
+        voltar={postId ? "/painel/novo-post" : "/painel/produtos"}
+        acao={id ? <AcaoTopo href={`/painel/produtos/${id}/estoque`}>Estoque</AcaoTopo> : undefined}
+      />
 
       {estado.erro ? (
-        <p role="alert" className="mt-4 rounded-xl bg-[#f8e4e1] px-3.5 py-3 text-sm text-erro">{estado.erro}</p>
+        <p role="alert" className="mb-4 rounded-xl bg-[#f8e4e1] px-3.5 py-3 text-sm text-erro">{estado.erro}</p>
       ) : null}
 
       {topo}
 
       <section className="mt-5">
-        <h2 className="mb-2 text-sm font-medium">Fotos</h2>
+        <h2 className="mb-2 font-titulo text-lg font-bold">Fotos</h2>
         <SeletorFotos fotos={fotos} aoMudar={setFotos} />
       </section>
 
@@ -206,7 +194,7 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
       <section className="mt-7">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="font-titulo text-lg font-semibold">Variações</h2>
+            <h2 className="font-titulo text-lg font-bold">Variações</h2>
             <p className="text-sm text-tinta-suave">Tamanho, cor, sabor...</p>
           </div>
           <button
@@ -227,7 +215,7 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
         {temVariacoes ? (
           <div className="mt-4 space-y-3">
             {opcoes.map((o, i) => (
-              <div key={i} className="rounded-2xl border border-linha bg-white p-3.5">
+              <div key={i} className="rounded-[var(--radius-balao)] bg-white p-3.5">
                 <div className="flex items-center gap-2">
                   <input
                     value={o.nome}
@@ -321,11 +309,11 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
       </section>
 
       <section className="mt-7">
-        <h2 className="font-titulo text-lg font-semibold">Estoque</h2>
+        <h2 className="font-titulo text-lg font-bold">Estoque</h2>
         <p className="text-sm text-tinta-suave">
           Vazio = não informado. Preço diferente só se essa opção custar outro valor.
         </p>
-        <ul className="mt-3 divide-y divide-linha rounded-2xl border border-linha bg-white">
+        <ul className="mt-3 divide-y divide-linha rounded-[var(--radius-balao)] bg-white">
           {combinacoes.map((atributos) => {
             const chave = chaveAtributos(atributos);
             const linha = linhas[chave] ?? { estoque: "", preco: "" };
@@ -364,7 +352,7 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
           texto="Ele sai da vitrine e da lista principal. Dá para ver depois no filtro Arquivados."
           rotuloConfirmar="Arquivar"
           perigo
-          className="mt-8 h-11 w-full rounded-xl text-sm font-medium text-erro hover:bg-[#f8e4e1]"
+          className="mt-8 h-11 w-full rounded-full text-sm font-semibold text-erro hover:bg-[#f8e4e1]"
         >
           Arquivar produto
         </BotaoConfirmar>
@@ -377,7 +365,7 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
             name="intencao"
             value="rascunho"
             disabled={salvando}
-            className="h-12 rounded-xl border border-linha font-medium disabled:opacity-70"
+            className="h-12 rounded-full border border-purpura-200 font-semibold disabled:opacity-70"
           >
             {publicado ? "Tirar da vitrine" : "Salvar rascunho"}
           </button>
@@ -386,7 +374,7 @@ export function EditorProduto({ id, categorias, inicial, publicado, postId = nul
             name="intencao"
             value="publicar"
             disabled={salvando}
-            className="h-12 rounded-xl bg-purpura-700 font-medium text-purpura-100 disabled:opacity-70"
+            className="h-12 rounded-full bg-purpura-700 font-semibold text-sobre-purpura disabled:opacity-70"
           >
             {salvando ? "Salvando…" : publicado ? "Salvar" : postId ? "Aprovar e publicar" : "Publicar"}
           </button>

@@ -44,7 +44,7 @@ export function ControleEstoque({ variacoes, ordem }: { variacoes: Variacao[]; o
     <div>
       <div className="flex items-center gap-2 text-sm">
         <span className="text-tinta-suave">O − conta como</span>
-        <div role="radiogroup" aria-label="Motivo da saída" className="flex rounded-xl bg-purpura-100 p-1">
+        <div role="radiogroup" aria-label="Motivo da saída" className="flex rounded-full bg-purpura-100 p-1">
           {MOTIVOS_SAIDA.map((m) => (
             <button
               key={m.valor}
@@ -52,7 +52,7 @@ export function ControleEstoque({ variacoes, ordem }: { variacoes: Variacao[]; o
               role="radio"
               aria-checked={motivoSaida === m.valor}
               onClick={() => setMotivoSaida(m.valor)}
-              className="h-8 rounded-lg px-3 text-purpura-900 aria-checked:bg-white aria-checked:font-medium aria-checked:shadow-sm"
+              className="h-8 rounded-full px-3 text-purpura-900 aria-checked:bg-purpura-700 aria-checked:font-semibold aria-checked:text-sobre-purpura"
             >
               {m.rotulo}
             </button>
@@ -62,7 +62,7 @@ export function ControleEstoque({ variacoes, ordem }: { variacoes: Variacao[]; o
 
       {erro ? <p role="alert" className="mt-3 text-sm text-erro">{erro}</p> : null}
 
-      <ul className="mt-4 divide-y divide-linha rounded-2xl border border-linha bg-white">
+      <ul className="mt-4 divide-y divide-linha rounded-[var(--radius-balao)] bg-white">
         {variacoes.map((v) => {
           const qtd = estoques[v.id];
           const rotulo = nomeVariacao(v.atributos, ordem);
@@ -73,14 +73,14 @@ export function ControleEstoque({ variacoes, ordem }: { variacoes: Variacao[]; o
                 type="button"
                 onClick={() => mover(v.id, -1)}
                 aria-label={`Tirar 1 de ${rotulo}`}
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-linha active:bg-purpura-100"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-purpura-200 active:bg-purpura-100"
               >
                 <Minus size={18} aria-hidden="true" />
               </button>
               <span
                 aria-live="polite"
                 aria-label={`Estoque de ${rotulo}`}
-                className={`w-10 text-center font-titulo text-2xl font-semibold ${qtd === 0 ? "text-erro" : ""}`}
+                className={`w-10 text-center font-titulo text-2xl font-bold tabular-nums ${qtd === 0 ? "text-erro" : ""}`}
               >
                 {qtd ?? "–"}
               </span>
@@ -88,7 +88,7 @@ export function ControleEstoque({ variacoes, ordem }: { variacoes: Variacao[]; o
                 type="button"
                 onClick={() => mover(v.id, 1)}
                 aria-label={`Somar 1 em ${rotulo}`}
-                className="flex h-11 w-11 items-center justify-center rounded-xl bg-purpura-700 text-purpura-100 active:opacity-80"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-purpura-700 text-sobre-purpura active:opacity-80"
               >
                 <Plus size={18} aria-hidden="true" />
               </button>

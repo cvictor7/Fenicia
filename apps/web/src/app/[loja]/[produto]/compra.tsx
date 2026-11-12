@@ -72,11 +72,11 @@ export function Compra({ slugLoja, whatsapp, cor, produto }: Props) {
 
   return (
     <>
-      <p className="mt-1 font-titulo text-2xl font-semibold">{precoMostrado}</p>
+      <p className="mt-1 font-titulo text-2xl font-bold tabular-nums">{precoMostrado}</p>
 
       {produto.opcoes.map((o) => (
         <fieldset key={o.nome} className="mt-5">
-          <legend className="text-sm font-medium">
+          <legend className="text-sm font-semibold">
             {o.nome}
             {escolha[o.nome] ? <span className="font-normal text-tinta-suave">: {escolha[o.nome]}</span> : null}
           </legend>
@@ -94,9 +94,9 @@ export function Compra({ slugLoja, whatsapp, cor, produto }: Props) {
                     setAdicionado(false);
                     setEscolha((e) => ({ ...e, [o.nome]: valor }));
                   }}
-                  className={`h-11 min-w-11 rounded-xl border px-4 text-sm transition disabled:text-tinta-suave/60 ${
+                  className={`h-11 min-w-12 rounded-full border px-4 text-sm font-medium transition disabled:text-tinta-suave/50 ${
                     s === "esgotado" ? "line-through" : ""
-                  } ${marcado ? "border-transparent text-white" : "border-linha bg-white"}`}
+                  } ${marcado ? "border-transparent text-white" : "border-linha bg-white"} ${s === "esgotado" ? "border-dashed" : ""}`}
                   style={marcado ? { background: cor } : undefined}
                   aria-label={s === "esgotado" ? `${valor}, esgotado` : valor}
                 >
@@ -110,13 +110,13 @@ export function Compra({ slugLoja, whatsapp, cor, produto }: Props) {
 
       {variante?.ultimas ? <p className="mt-4 text-sm font-medium text-[#b26b00]">Últimas unidades</p> : null}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-linha bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-linha bg-white pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex max-w-md gap-2 px-4 py-3">
           {whatsapp ? (
             <a
               href={linkWhatsapp(whatsapp, `Oi! Tenho uma dúvida sobre ${produto.nome}.`)}
               aria-label="Tirar dúvida no WhatsApp"
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-linha"
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-linha"
             >
               <MessageCircle size={20} aria-hidden="true" />
             </a>
@@ -124,7 +124,7 @@ export function Compra({ slugLoja, whatsapp, cor, produto }: Props) {
           {adicionado ? (
             <Link
               href={`/${slugLoja}/sacola`}
-              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl font-medium text-white"
+              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full font-semibold text-white"
               style={{ background: cor }}
             >
               <Check size={18} aria-hidden="true" /> Na sacola · Ver sacola
@@ -134,7 +134,7 @@ export function Compra({ slugLoja, whatsapp, cor, produto }: Props) {
               type="button"
               onClick={colocarNaSacola}
               disabled={!variante || !variante.disponivel}
-              className="h-12 flex-1 rounded-xl font-medium text-white disabled:opacity-50"
+              className="h-12 flex-1 rounded-full font-semibold text-white disabled:opacity-40"
               style={{ background: cor }}
             >
               {variante && !variante.disponivel

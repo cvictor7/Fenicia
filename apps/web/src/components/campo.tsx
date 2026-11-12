@@ -11,7 +11,7 @@ export function Campo({ rotulo, dica, erro, id, ...resto }: Props) {
   const campoId = id ?? resto.name;
   return (
     <label htmlFor={campoId} className="block">
-      <span className="mb-1.5 block text-sm font-medium">{rotulo}</span>
+      <span className="mb-1.5 block text-sm font-semibold">{rotulo}</span>
       <input
         id={campoId}
         className="block h-12 w-full rounded-xl border border-linha bg-white px-3.5 text-base outline-none transition focus:border-purpura-700 focus:ring-2 focus:ring-purpura-100 aria-invalid:border-erro"
@@ -38,7 +38,7 @@ export function BotaoPrincipal({
     <button
       type="submit"
       disabled={carregando}
-      className="h-12 w-full rounded-xl bg-purpura-700 font-medium text-purpura-100 transition active:scale-[0.99] disabled:opacity-70"
+      className="h-12 w-full rounded-full bg-purpura-700 font-semibold text-sobre-purpura transition active:scale-[0.99] disabled:opacity-70"
     >
       {carregando ? "Um momento…" : children}
     </button>

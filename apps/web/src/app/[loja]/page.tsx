@@ -35,44 +35,51 @@ async function Vitrine({ params }: { params: Params }) {
 
   return (
     <>
-      <header className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          {loja.logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={loja.logoUrl} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" />
-          ) : (
-            <span
-              aria-hidden="true"
-              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full font-titulo text-2xl font-semibold text-white"
-              style={{ background: cor }}
-            >
-              {inicial}
-            </span>
-          )}
-          <div className="min-w-0">
-            <h1 className="truncate font-titulo text-2xl font-semibold tracking-tight">{loja.nome}</h1>
-            {loja.cidade ? <p className="text-sm text-tinta-suave">{loja.cidade}</p> : null}
-          </div>
-        </div>
+      <div className="flex justify-end">
         <BotaoSacola slug={loja.slug} cor={cor} />
+      </div>
+      <header className="-mt-2 flex items-center gap-5">
+        <span className="shrink-0 rounded-full p-[3px]" style={{ background: cor }}>
+          <span className="block rounded-full border-[3px] border-white">
+            {loja.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={loja.logoUrl} alt="" className="h-20 w-20 rounded-full object-cover" />
+            ) : (
+              <span
+                aria-hidden="true"
+                className="flex h-20 w-20 items-center justify-center rounded-full font-titulo text-3xl font-bold text-white"
+                style={{ background: cor }}
+              >
+                {inicial}
+              </span>
+            )}
+          </span>
+        </span>
+        <div className="min-w-0">
+          <h1 className="font-titulo text-2xl font-bold leading-tight tracking-tight">{loja.nome}</h1>
+          <p className="mt-1 text-sm text-tinta-suave">
+            <b className="font-semibold text-tinta">{produtos.length}</b> {produtos.length === 1 ? "produto" : "produtos"}
+            {loja.cidade ? <> em {loja.cidade}</> : null}
+          </p>
+        </div>
       </header>
 
-      {loja.bio ? <p className="mt-3 text-[15px] leading-relaxed">{loja.bio}</p> : null}
+      {loja.bio ? <p className="mt-4 text-[15px] leading-relaxed">{loja.bio}</p> : null}
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 flex gap-2">
         {loja.whatsapp ? (
           <a
             href={linkWhatsapp(loja.whatsapp, `Oi! Vim pela vitrine da ${loja.nome}.`)}
-            className="flex h-11 items-center justify-center rounded-xl font-medium text-white"
+            className="flex h-10 flex-1 items-center justify-center rounded-lg text-sm font-semibold text-white"
             style={{ background: cor }}
           >
-            WhatsApp
+            Chamar no WhatsApp
           </a>
         ) : null}
         {loja.instagram ? (
           <a
             href={`https://instagram.com/${loja.instagram}`}
-            className="flex h-11 items-center justify-center rounded-xl border border-linha bg-white font-medium"
+            className="flex h-10 flex-1 items-center justify-center rounded-lg bg-[#efefef] text-sm font-semibold"
           >
             @{loja.instagram}
           </a>
@@ -80,7 +87,7 @@ async function Vitrine({ params }: { params: Params }) {
       </div>
 
       {produtos.length === 0 ? (
-        <p className="mt-10 text-center text-tinta-suave">Nenhum produto por aqui ainda. Volte logo!</p>
+        <p className="mt-10 border-t border-linha pt-10 text-center text-tinta-suave">Os produtos aparecem aqui assim que a loja publicar.</p>
       ) : (
         <Catalogo slug={loja.slug} produtos={produtos} cor={cor} />
       )}
@@ -91,8 +98,8 @@ async function Vitrine({ params }: { params: Params }) {
 
 export default function PaginaVitrine({ params }: { params: Params }) {
   return (
-    <main className="mx-auto max-w-md bg-areia px-4 pt-6">
-      <Suspense fallback={<div className="h-40 animate-pulse rounded-2xl bg-linha/40" />}>
+    <main className="mx-auto min-h-dvh max-w-md bg-white px-4 pt-4">
+      <Suspense fallback={<div className="mt-12 flex items-center gap-5"><span className="h-[92px] w-[92px] animate-pulse rounded-full bg-linha" /><span className="h-6 w-40 animate-pulse rounded bg-linha" /></div>}>
         <Vitrine params={params} />
       </Suspense>
     </main>

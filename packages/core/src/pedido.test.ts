@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatarNumeroPedido, linkWhatsapp, montarMensagemPedido, totalPedido } from "./pedido";
+import { formatarNumeroPedido, inicioDoDia, linkWhatsapp, montarMensagemPedido, totalPedido } from "./pedido";
 
 describe("pedido", () => {
   it("formata o número", () => {
@@ -31,5 +31,14 @@ describe("pedido", () => {
     expect(linkWhatsapp("55 92 98416-3597", "Oi & tudo?")).toBe(
       "https://wa.me/5592984163597?text=Oi%20%26%20tudo%3F",
     );
+  });
+});
+
+describe("inicioDoDia", () => {
+  it("meia-noite de Manaus em UTC", () => {
+    // 11/11 às 23h em Manaus = 12/11 03h UTC: o dia ainda é 11/11
+    expect(inicioDoDia(new Date("2026-11-12T03:00:00Z")).toISOString()).toBe("2026-11-11T04:00:00.000Z");
+    // 12/11 às 01h em Manaus
+    expect(inicioDoDia(new Date("2026-11-12T05:00:00Z")).toISOString()).toBe("2026-11-12T04:00:00.000Z");
   });
 });

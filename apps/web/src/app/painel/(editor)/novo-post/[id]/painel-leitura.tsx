@@ -40,8 +40,8 @@ export function PainelLeitura({
   const partes = sugestao.trechoPreco ? legenda.split(sugestao.trechoPreco) : [legenda];
 
   return (
-    <section className="mt-4 rounded-2xl border border-linha bg-white p-4">
-      <p className="flex items-center gap-1.5 text-sm font-medium text-purpura-700">
+    <section className="mb-5 rounded-[var(--radius-balao)] bg-white p-4">
+      <p className="flex items-center gap-1.5 font-titulo font-bold text-purpura-700">
         <Sparkles size={16} aria-hidden="true" />
         {modelo === "leitura-simples" ? "Lido pela leitura simples" : "Lido pela IA"}
       </p>
@@ -49,7 +49,7 @@ export function PainelLeitura({
         {itens.map((item) => (
           <li key={item.rotulo} className="flex gap-2 text-sm">
             {item.ok ? (
-              <CircleCheck size={18} className="mt-0.5 shrink-0 text-[#0f6e56]" aria-label="Lido" />
+              <CircleCheck size={18} className="mt-0.5 shrink-0 text-ok" aria-label="Lido" />
             ) : (
               <CircleAlert size={18} className="mt-0.5 shrink-0 text-[#b26b00]" aria-label="Preencha" />
             )}

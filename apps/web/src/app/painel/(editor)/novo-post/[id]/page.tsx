@@ -29,7 +29,7 @@ async function Revisao({ params }: { params: Params }) {
   if (post.status === "aprovado") {
     return (
       <Vazio titulo="Esse post já virou produto" texto="Ele está na sua lista de produtos.">
-        <Link href="/painel/produtos" className="inline-flex h-11 items-center rounded-xl bg-purpura-700 px-5 font-medium text-purpura-100">
+        <Link href="/painel/produtos" className="inline-flex h-11 items-center rounded-full bg-purpura-700 px-5 font-semibold text-sobre-purpura">
           Ver produtos
         </Link>
       </Vazio>

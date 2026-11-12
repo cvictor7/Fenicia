@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import "@fontsource/instrument-sans/400.css";
+import "@fontsource/instrument-sans/500.css";
+import "@fontsource/instrument-sans/600.css";
 import "@fontsource/noto-sans-phoenician/400.css";
 import "@fontsource-variable/bricolage-grotesque/index.css";
 import "./globals.css";
@@ -9,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#3a0e2e",
+  themeColor: "#4a1238",
 };
 
 export default function RootLayout({

@@ -12,13 +12,13 @@ const itens = [
   { href: "/painel/loja", rotulo: "Loja", Icone: Store },
 ];
 
-/** Barra de baixo do painel, ao alcance do polegar no celular. */
-export function Navegacao() {
+/** Barra de baixo, em púrpura escuro, ao alcance do polegar. */
+export function Navegacao({ pedidosNovos = 0 }: { pedidosNovos?: number }) {
   const caminho = usePathname();
   return (
     <nav
       aria-label="Painel"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-linha bg-white/95 backdrop-blur pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 bg-purpura-950 pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto grid max-w-md grid-cols-5">
         {itens.map(({ href, rotulo, Icone, exato, destaque }) => {
@@ -28,16 +28,26 @@ export function Navegacao() {
               <Link
                 href={href}
                 aria-current={ativo ? "page" : undefined}
-                className="flex h-16 flex-col items-center justify-center gap-1 text-[11px] text-tinta-suave aria-[current=page]:font-medium aria-[current=page]:text-purpura-700"
+                className="relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] text-sobre-purpura-suave aria-[current=page]:font-semibold aria-[current=page]:text-white"
               >
                 {destaque ? (
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-purpura-700 text-purpura-100">
-                    <Icone size={20} strokeWidth={2.2} aria-hidden="true" />
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sobre-purpura text-purpura-700">
+                    <Icone size={22} strokeWidth={2.4} aria-hidden="true" />
                   </span>
                 ) : (
-                  <Icone size={22} strokeWidth={ativo ? 2.2 : 1.8} aria-hidden="true" />
+                  <span className="relative">
+                    <Icone size={22} strokeWidth={ativo ? 2.3 : 1.8} aria-hidden="true" />
+                    {href === "/painel/pedidos" && pedidosNovos > 0 ? (
+                      <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-murex px-1 text-[10px] font-bold text-purpura-950">
+                        {pedidosNovos}
+                      </span>
+                    ) : null}
+                  </span>
                 )}
-                {rotulo}
+                {destaque ? <span className="sr-only">{rotulo}</span> : rotulo}
+                {ativo && !destaque ? (
+                  <span aria-hidden="true" className="absolute top-0 h-0.5 w-8 rounded-full bg-murex" />
+                ) : null}
               </Link>
             </li>
           );

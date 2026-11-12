@@ -15,18 +15,21 @@ async function RedirecionarSeLogado() {
 
 export default function PaginaEntrar() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col px-4 py-8">
+    <main className="min-h-dvh">
       <Suspense>
         <RedirecionarSeLogado />
       </Suspense>
-      <Logo tamanho={36} />
-      <h1 className="mt-10 font-titulo text-3xl font-semibold tracking-tight">
-        Você vende. A Fenícia organiza.
-      </h1>
-      <p className="mt-2 text-tinta-suave">
-        Entre para cuidar da sua loja: produtos, estoque e pedidos no mesmo lugar.
-      </p>
-      <div className="mt-8">
+      <div className="bg-purpura-700 text-sobre-purpura">
+        <div className="mx-auto max-w-md px-5 pb-10 pt-7">
+          <Logo tamanho={32} claro />
+          <h1 className="mt-10 font-titulo text-[40px] font-extrabold leading-[0.98] tracking-tight">
+            Você vende.
+            <br />
+            A Fenícia organiza.
+          </h1>
+        </div>
+      </div>
+      <div className="mx-auto -mt-5 max-w-md rounded-t-[28px] bg-areia px-5 pt-6">
         <FormularioAcesso />
       </div>
     </main>

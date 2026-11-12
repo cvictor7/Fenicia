@@ -11,7 +11,7 @@ export function FormularioAcesso() {
 
   return (
     <div>
-      <div role="tablist" className="mb-6 grid grid-cols-2 rounded-xl bg-purpura-100 p-1 text-sm">
+      <div role="tablist" className="mb-6 grid grid-cols-2 rounded-full bg-purpura-100 p-1 text-sm">
         {(["entrar", "criar"] as const).map((m) => (
           <button
             key={m}
@@ -19,7 +19,7 @@ export function FormularioAcesso() {
             type="button"
             aria-selected={modo === m}
             onClick={() => setModo(m)}
-            className="h-10 rounded-lg font-medium text-purpura-900 transition aria-selected:bg-white aria-selected:shadow-sm"
+            className="h-10 rounded-full font-semibold text-purpura-900 transition aria-selected:bg-purpura-700 aria-selected:text-sobre-purpura"
           >
             {m === "entrar" ? "Entrar" : "Criar conta"}
           </button>

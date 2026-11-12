@@ -1,21 +1,32 @@
 @import "tailwindcss";
 
-/* Identidade da Fenícia: púrpura de Tiro + alfabeto fenício */
+/*
+ * Identidade da Fenícia: púrpura de Tiro, o corante mais caro da Antiguidade.
+ * A cor é o "chão" do topo das telas e da navegação, não só a cor do botão.
+ */
 @theme {
-  --color-purpura-950: #2a0820;
+  --color-purpura-950: #2e0a23; /* navegação, texto mais forte */
   --color-purpura-900: #3a0e2e;
-  --color-purpura-700: #5e1a4a;
-  --color-purpura-500: #b84a8c;
-  --color-purpura-100: #f3e6ee;
-  --color-areia: #f7f6f4;
-  --color-tinta: #2a1a24;
-  --color-tinta-suave: #6b5562;
-  --color-linha: #e2d9de;
-  --color-erro: #a33a2d;
+  --color-purpura-700: #4a1238; /* cor principal: faixas e botões */
+  --color-purpura-500: #b0477f; /* letras fenícias, destaques */
+  --color-purpura-200: #d9c4d2;
+  --color-purpura-100: #ecdfe8; /* fundos suaves, abas */
+  --color-sobre-purpura: #f6e9f1; /* texto em cima do púrpura */
+  --color-sobre-purpura-suave: #cdb3c4;
+  --color-murex: #ffb4a2; /* alerta em cima do púrpura (concha do murex) */
+  --color-areia: #f3eef2; /* fundo das telas: papel levemente lilás */
+  --color-tinta: #2a0f21;
+  --color-tinta-suave: #76586b;
+  --color-linha: #e3d7df;
+  --color-erro: #b3261e;
+  --color-ok: #1f7a5a;
 
-  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
   --font-titulo: "Bricolage Grotesque Variable", var(--font-sans);
   --font-fenicio: "Noto Sans Phoenician", serif;
+
+  /* cartão em forma de balão de conversa: o pedido nasce de uma conversa */
+  --radius-balao: 6px 20px 20px 20px;
 }
 
 html {
@@ -33,4 +44,18 @@ select,
 textarea,
 button {
   font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-purpura-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
